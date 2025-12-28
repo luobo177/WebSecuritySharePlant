@@ -1,21 +1,28 @@
 from datetime import time
-from back.app.core.test import payload
-from back.app.core.tool.hash import hash_tx
-from back.app.core.tx.BaseTx import BaseTx, TxType
+from back.test import payload
+from back.app.core.tool.hash import hash_
 from back.app.core.wallet.wallet import Wallet
 import requests
 import time
 from back.app.config import SERVER_ADDR
+from back.app.servece.TxService import create_attack_tx
+from back.app.servece.UserDB import create_attack_tx_to_DB, init_User
+
 
 def get_leader_info():
     resp = requests.get(f"{SERVER_ADDR}/leader_info")
     return resp.json()
 
-def send_attack_tx(tx: BaseTx):   ##将消息发给leader，让其打包
-    if tx.tx_type != TxType.ATTACK:
-        raise ValueError('Invalid tx type')
+def send_tx(tx):   ##将消息发给leader，让其打包
     leader_info=get_leader_info()
-    requests.post(f"{leader_info['addr']}/tx",json=tx)
+    try:
+        resp = requests.post(f"{leader_info['addr']}/tx",json=tx,timeout=2)
+        return resp.status_code
+    except Exception as e:
+        print("send failed",e)
+        return None
+
+
 
 def register_to_center(public_key,sign_func,invite_code):
     payload = {
@@ -23,7 +30,7 @@ def register_to_center(public_key,sign_func,invite_code):
         "invite_code": invite_code,
         "timestamp": int(time.time()),
     }
-    payload_hash = hash_tx(payload)
+    payload_hash = hash_(payload)
     signature = sign_func(payload_hash)
     payload["signature"] = signature
 
@@ -41,7 +48,18 @@ class User:
         self.role = None
         self.wallet = Wallet()
         self.invite_code = None
+        ##向center请求自己的role和id，并提交自己的invite_code和public_key
         Id,role = register_to_center(self.wallet.public_key, self.wallet.sign, self.invite_code)
+        self.userId = Id
+        self.role = role
+        init_User()
+        ##开始创建tx，并直接提交给leader，串行
+        while True:
+            tx = create_attack_tx(self.wallet,payload)
+            create_attack_tx_to_DB(tx)
+            if tx is not None:
+                send_tx(tx)
+            time.sleep(0.1)
 
 
 

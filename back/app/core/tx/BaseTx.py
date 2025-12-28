@@ -14,3 +14,4 @@ class BaseTx:
     timestamp: int
     nonce: int
     signature: str=""
+    tx_hash:str=""
