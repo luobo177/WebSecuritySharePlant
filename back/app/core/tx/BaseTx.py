@@ -15,3 +15,15 @@ class BaseTx:
     nonce: int
     signature: str=""
     tx_hash:str=""
+
+    @classmethod
+    def from_dict(cls, tx):
+        return cls(
+            sender=tx["sender"],
+            tx_type=tx["tx_type"],
+            payload=tx["payload"],
+            signature=tx["signature"],
+            tx_hash=tx["tx_hash"],
+            timestamp=tx["timestamp"],
+            nonce=tx["nonce"],
+        )

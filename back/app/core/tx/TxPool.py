@@ -1,8 +1,10 @@
 from typing import List,Iterable, Optional
-from BaseTx import BaseTx, TxType
+
+from back.app.core.tx.BaseTx import BaseTx
+from back.app.core.tx.BaseTx import TxType
 
 
-class AttackTxPool:
+class TxPool:
     def __init__(self):
         self.pool: List[BaseTx] = []
 

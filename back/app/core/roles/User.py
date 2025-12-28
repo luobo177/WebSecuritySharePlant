@@ -1,6 +1,7 @@
 from datetime import time
-from back.test import payload
+
 from back.app.core.tool.hash import hash_
+from back.app.core.tx.AttackTx import AttackPayLoad
 from back.app.core.wallet.wallet import Wallet
 import requests
 import time
@@ -10,17 +11,27 @@ from back.app.servece.UserDB import create_attack_tx_to_DB, init_User
 
 
 def get_leader_info():
-    resp = requests.get(f"{SERVER_ADDR}/leader_info")
-    return resp.json()
+    return {
+        "addr": "http://mock-leader:9000",
+        "pubkey": "leader_pubkey_mock"
+    }
+    ##resp = requests.get(f"{SERVER_ADDR}/leader_info")
+    # return resp.json()
 
 def send_tx(tx):   ##将消息发给leader，让其打包
     leader_info=get_leader_info()
-    try:
-        resp = requests.post(f"{leader_info['addr']}/tx",json=tx,timeout=2)
-        return resp.status_code
-    except Exception as e:
-        print("send failed",e)
-        return None
+
+    print(f"[MOCK] send tx to {leader_info['addr']}/tx")
+    print(f"[MOCK] tx =", tx.tx_hash)
+    print(f"[MOCK] tx_hash={tx.tx_hash}, from={tx.sender}")
+
+    return 200
+    # try:
+    #     resp = requests.post(f"{leader_info['addr']}/tx",json=tx,timeout=2)
+    #     return resp.status_code
+    # except Exception as e:
+    #     print("send failed",e)
+    #     return None
 
 
 
@@ -55,10 +66,9 @@ class User:
         init_User()
         ##开始创建tx，并直接提交给leader，串行
         while True:
-            tx = create_attack_tx(self.wallet,payload)
+            tx = create_attack_tx(self.wallet,AttackPayLoad)
             create_attack_tx_to_DB(tx)
-            if tx is not None:
-                send_tx(tx)
+            send_tx(tx)
             time.sleep(0.1)
 
 
