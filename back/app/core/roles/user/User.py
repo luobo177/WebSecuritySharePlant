@@ -12,7 +12,7 @@ from back.app.servece.UserDB import create_attack_tx_to_DB, init_User
 
 def get_leader_info():
     return {
-        "addr": "http://mock-leader:9000",
+        "addr": "http://127.0.0.1:9000",
         "pubkey": "leader_pubkey_mock"
     }
     ##resp = requests.get(f"{SERVER_ADDR}/leader_info")
@@ -20,18 +20,13 @@ def get_leader_info():
 
 def send_tx(tx):   ##将消息发给leader，让其打包
     leader_info=get_leader_info()
-
-    print(f"[MOCK] send tx to {leader_info['addr']}/tx")
-    print(f"[MOCK] tx =", tx.tx_hash)
-    print(f"[MOCK] tx_hash={tx.tx_hash}, from={tx.sender}")
-
-    return 200
-    # try:
-    #     resp = requests.post(f"{leader_info['addr']}/tx",json=tx,timeout=2)
-    #     return resp.status_code
-    # except Exception as e:
-    #     print("send failed",e)
-    #     return None
+    tx = tx.to_dict()
+    try:
+        resp = requests.post(f"{leader_info['addr']}/tx",json=tx,timeout=2)
+        return resp.status_code
+    except Exception as e:
+        print("send failed",e)
+        return None
 
 
 

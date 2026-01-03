@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from back.app.core.model.user import RegisterRequest
 from back.app.servece.Register import register_user
 
-router = APIRouter(prefix='/api/center')
+router = APIRouter()
 
 @router.post('/register')
 def register_user_api(req: RegisterRequest):

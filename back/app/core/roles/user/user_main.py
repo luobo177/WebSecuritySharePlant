@@ -1,4 +1,4 @@
-from back.app.core.roles.User import send_tx
+from back.app.core.roles.user.User import send_tx
 from back.app.core.tx.AttackTx import AttackPayLoad
 from back.app.core.wallet.wallet import Wallet
 from back.app.servece.TxService import create_attack_tx
@@ -24,4 +24,6 @@ payload=raw.to_payload()
 tx = create_attack_tx(wallet,payload)
 create_attack_tx_to_DB(tx)
 res = send_tx(tx)
-print(tx)
+print(res)
+
+

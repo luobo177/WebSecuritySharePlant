@@ -6,6 +6,8 @@ from back.app.servece.leader_serverce import LeaderService
 class Leader:
     def __init__(self):
         self.wallet = wallet.Wallet()
-        pool = TxPool
-        self.LeaderService = LeaderService(pool)  
+        pool = TxPool()
+        self.LeaderService = LeaderService(pool,wallet.sign_tx)
+
+
 

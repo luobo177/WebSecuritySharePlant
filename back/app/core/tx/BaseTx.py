@@ -20,10 +20,21 @@ class BaseTx:
     def from_dict(cls, tx):
         return cls(
             sender=tx["sender"],
-            tx_type=tx["tx_type"],
+            tx_type=TxType(tx["tx_type"]),  # 👈 反序列化 Enum
             payload=tx["payload"],
-            signature=tx["signature"],
-            tx_hash=tx["tx_hash"],
             timestamp=tx["timestamp"],
             nonce=tx["nonce"],
+            signature=tx.get("signature", ""),
+            tx_hash=tx.get("tx_hash", ""),
         )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "sender": self.sender,
+            "tx_type": self.tx_type.value,    # 👈 Enum → str
+            "payload": self.payload,
+            "timestamp": self.timestamp,
+            "nonce": self.nonce,
+            "signature": self.signature,
+            "tx_hash": self.tx_hash,
+        }
